@@ -1,28 +1,25 @@
+import AppError from '../utils/AppError.js';
+
 class UserController{
-
-	// getAllUsers(){}
-
-	// getUserById(id){}
 
 	create(req,res){
 		const { username, password, email } = req.body;
 
-		const UserTest ={
-			'username':'brunolralves',
-			'password':'Bcd141910*',
-			'email':'brunolralvesdev@gmail.com'
-		};
-
-		if((UserTest.username==username ||UserTest.email==email) && UserTest.password==password){
-			res.send('validado com sucesso!');
-		}else {
-			res.send('Invalid username or password');
+		if (!username) {
+			throw new AppError('Nome é obrigatorio',400);
 		}
+
+		if (!password) {
+			throw new AppError('Senha é obrigatorio',400);
+		}
+
+		if (!email) {
+			throw new AppError('Email é obrigatorio',400);
+			
+		}
+		res.status(201).json({username,password,email});
 	}
 
-	// updateUser(id,user){}
-
-	// deleteUser(id){}
 }
 
 export default UserController;
