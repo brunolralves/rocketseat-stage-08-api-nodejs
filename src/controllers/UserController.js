@@ -1,23 +1,28 @@
 import AppError from '../utils/AppError.js';
+import sqliteConnection from '../database/sqlite/index.js';
+import {randomUUID} from 'crypto';
 
 class UserController{
 
-	create(req,res){
-		const { username, password, email } = req.body;
+	async create(req,res){
+		const { name, password, email } = req.body;
 
-		if (!username) {
-			throw new AppError('Nome é obrigatorio',400);
-		}
+		const database = await sqliteConnection();
 
-		if (!password) {
-			throw new AppError('Senha é obrigatorio',400);
-		}
+		try {
+			const checkUserExists = await database.get('SELECT * FROM users WHERE email = (?)',[email]);
 
-		if (!email) {
-			throw new AppError('Email é obrigatorio',400);
+			if(checkUserExists){
+				throw new AppError('Email já em uso');
+			}
+
+			await database.run('INSERT INTO users (id,name,email,password) VALUES (?,?,?,?)',[randomUUID(),name,email,password]);
 			
+		} catch (error) {
+			return res.json(error);
 		}
-		res.status(201).json({username,password,email});
+		
+		return res.status(201).json({});
 	}
 
 }
