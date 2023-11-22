@@ -26,6 +26,25 @@ class UserController{
 		return res.status(201).json({});
 	}
 
+	async update(req, res){
+		const database = await sqliteConnection();
+		const { name,email, avatar } = req.body;
+		const { id } = req.params;
+
+		try {
+			const userInDatabase = await database.get('SELECT * FROM users WHERE user_id = (?)',[id]);
+			if(!userInDatabase){
+				console.log('Cai aqui!!');
+				throw new AppError('Usuario não encontrado');
+			}
+			database.run('UPDATE users SET name = ?, email = ?, avatar = ? WHERE user_id = ?',[name,email,avatar,id]);
+
+
+			return res.status(201).json();
+		} catch (error) {
+			return res.status(400).json(error);
+		}
+	}
 }
 
 export default UserController;

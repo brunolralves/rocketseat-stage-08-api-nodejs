@@ -19,7 +19,6 @@ app.use((error,req,res,next)=>{
 			message: error.message
 		});
 	}
-	console.log('Depois dela');
 	return res.status(500).json({
 		status:'error',
 		message:'Internal server error'

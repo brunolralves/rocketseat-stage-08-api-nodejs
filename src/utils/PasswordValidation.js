@@ -10,6 +10,12 @@ class PasswordValidation{
 		return hashedPassword;
 	}
 
+	async isSamePassword(password, oldPassword){
+		const passwordValidated = await bcrypt.compare(password, oldPassword);
+
+		return passwordValidated;
+	}
+
 }
 
 export default PasswordValidation;
