@@ -1,0 +1,15 @@
+import bcrypt from 'bcryptjs';
+
+class PasswordValidation{
+
+	async encrypt(password) {
+  
+		const salt = bcrypt.genSaltSync(8);
+		const hashedPassword = await bcrypt.hashSync(password,salt);
+  
+		return hashedPassword;
+	}
+
+}
+
+export default PasswordValidation;
