@@ -5,8 +5,7 @@ const usersCredentialsRoutes = Router();
 const userCredentialsController = new UserCredentialsController();
 
 
-
-usersCredentialsRoutes.put('/alterarsenha',userCredentialsController.update);
+usersCredentialsRoutes.put('/',userCredentialsController.update);
 
 
 export default usersCredentialsRoutes;

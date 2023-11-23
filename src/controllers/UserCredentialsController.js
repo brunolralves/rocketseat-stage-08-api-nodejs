@@ -3,29 +3,41 @@ import AppError from '../utils/AppError.js';
 import PasswordValidation from '../utils/PasswordValidation.js';
 
 
-
 class UserCredentialsController{
   
 	async update(req,res){
-		const database = await new sqliteConnection();
-		const validation = new PasswordValidation();
+		const database = await sqliteConnection();
+		const encryptor = new PasswordValidation;
 		const {newPassword, oldPassword ,email} = req.body;
+		const user = await database.get('SELECT * FROM users WHERE email = ?',[email]);
     
 		try {
-			const userInDatabase = await database.get('SELECT * FROM users WHERE email = ?',[email]);
 
-			if(!userInDatabase){
-				throw new AppError('Usuario não encontrado');
+			if(!user) throw new AppError('Usuario não encontrado');
+			
+
+			if(newPassword && !oldPassword) throw new AppError('É necessario informar a senha atual para redefinir a senha!');
+
+			if(newPassword && oldPassword) {
+				const checkOldPassword = await encryptor.isSamePassword(oldPassword,user.password);
+
+				if(!checkOldPassword) throw new AppError('Senha antiga não confere');
 			}
 
-			if(validation.compare(userInDatabase.password, oldPassword)){
-				const newPasswordEncrypted = validation.encrypt(newPassword);
-				await database.run('UPDATE users SET password = ? WHERE email = ?',[newPasswordEncrypted,email]);
-			}
+			user.password = await encryptor.encrypt(newPassword);
+			user.email = email;
 
-			return res.json({success:true});
+			await database.run(`
+			UPDATE users SET
+			password = ?,
+			updated_at = datetime('now','localtime')
+			WHERE email = ?`,
+			[user.password,email]);
+
+			return res.json({'message': 'Password changed!'});
+
 		} catch (error) {
-			res.json();
+			return res.json(error);
 		}
 	}
 }

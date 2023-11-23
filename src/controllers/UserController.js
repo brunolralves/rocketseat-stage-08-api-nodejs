@@ -3,13 +3,14 @@ import sqliteConnection from '../database/sqlite/index.js';
 import {randomUUID} from 'crypto';
 import PasswordValidation from '../utils/PasswordValidation.js';
 
-const validation = new PasswordValidation();
+
+const database = await sqliteConnection();
 class UserController{
 
 	async create(req,res){
 		const { name, password, email } = req.body;
-		const hashedPassword = validation.Encrypt(password);
-		const database = await sqliteConnection();
+		const encryptor = await new PasswordValidation;
+		const hashedPassword = await encryptor.encrypt(password);
 		try {
 			const checkUserExists = await database.get('SELECT * FROM users WHERE email = (?)',[email]);
 
@@ -20,25 +21,34 @@ class UserController{
 			await database.run('INSERT INTO users (id,name,email,password) VALUES (?,?,?,?)',[randomUUID(),name,email,hashedPassword]);
 			
 		} catch (error) {
-			return res.json(error);
+			return res.json({});
 		}
 		
 		return res.status(201).json({});
 	}
 
-	async update(req, res){
-		const database = await sqliteConnection();
+	async update(req, res){		
 		const { name,email, avatar } = req.body;
 		const { id } = req.params;
-
 		try {
-			const userInDatabase = await database.get('SELECT * FROM users WHERE user_id = (?)',[id]);
-			if(!userInDatabase){
-				console.log('Cai aqui!!');
+			const user = await database.get('SELECT * FROM users WHERE user_id = (?)',[id]);
+			if(!user){
 				throw new AppError('Usuario não encontrado');
 			}
-			database.run('UPDATE users SET name = ?, email = ?, avatar = ? WHERE user_id = ?',[name,email,avatar,id]);
 
+			user.name = name ?? user.name;
+			user.email = email ?? user.email;
+			user.avatar = avatar ?? user.avatar;
+
+			
+			await database.run(`
+			UPDATE users SET 
+			name = ?, 
+			email = ?, 
+			avatar = ?,
+			updated_at = datetime('now','localtime') 
+			WHERE user_id = ?`,
+			[user.name,user.email,user.avatar,user.id]);
 
 			return res.status(201).json();
 		} catch (error) {
