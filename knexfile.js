@@ -3,7 +3,6 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 export default {
 	development: {
 		client: 'sqlite3',
@@ -20,3 +19,4 @@ export default {
 		useNullAsDefault: true
 	}
 };
+

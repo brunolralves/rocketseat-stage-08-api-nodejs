@@ -1,14 +1,13 @@
+export const up = knex => knex.schema.
+	createTable('notes', table => {
+		table.increments('note_id');
+		table.text('id');
+		table.text('title');
+		table.text('description');
+		table.integer('user_id').references('user_id').inTable('users');
 
-
-export const up = knex => knex.schema.createTable('notes', table => {
-	table.increments('note_id');
-	table.text('id');
-	table.text('title');
-	table.text('description');
-	table.integer('user_id').references('user_id').inTable('users');
-
-	table.timestamp('created_at').default(knex.fn.now());
-	table.timestamp('updated_at').default(knex.fn.now());
-});
+		table.timestamp('created_at').default(knex.fn.now());
+		table.timestamp('updated_at').default(knex.fn.now());
+	});
 
 export const down = knex => knex.schema.dropTable('notes');
