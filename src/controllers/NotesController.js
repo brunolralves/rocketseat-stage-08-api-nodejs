@@ -101,6 +101,14 @@ class NotesController{
 		}
 	}
 
+	async index(req,res){
+		const {user_id} = req.query;
+
+
+		const notesFounded = await knex('notes').where(x => x.user_id == user_id).orderBy('id');
+
+		res.json({notes:notesFounded});
+	}
 }
 
 export default NotesController;
