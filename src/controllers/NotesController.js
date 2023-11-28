@@ -27,23 +27,24 @@ class NotesController{
 		const linksInsert = links.map(link =>{
 			return{
 				note_id,
-				url: link
+				url: link,
+				id: randomUUID()
 			};
 		});
 		// console.log(linksInsert);
 
 		await knex('links').insert(linksInsert);
 
-		// const id_tag
+		
 		const tagsInsert = tags.map(name =>{
 			return{
 				note_id,
 				name,
-				user_id
+				user_id,
+				id: randomUUID()
 			};
 		});
 		
-		console.log(tagsInsert);
 		await knex('tags').insert(tagsInsert);
 
 		res.json();
@@ -55,9 +56,20 @@ class NotesController{
 		console.log('here');
 		const {id} = req.params;
 
-		const note = await knex('notes').where(x=>x.note_id = id);
-		const tags = await knex('tags').where(x => x.note_id = id).orderBy('name');
-		const links = await knex('links').where(x => x.note_id = id).orderBy('created_at');
+		const note = await 
+		knex('notes')
+			.where(x=>x.note_id = id)
+			.first();
+			
+		const tags = 
+		await knex('tags')
+			.where(x => x.note_id = id)
+			.orderBy('tag_id');
+
+		const links = 
+		await knex('links')
+			.where(x => x.note_id = id)
+			.orderBy('created_at');
 
 		return res.json({
 			...note,
