@@ -9,10 +9,6 @@ class NotesController{
 	async create(req,res){	
 		const {title, description,tags,links}  = req.body;
 		const {user_id}	= req.params;
-
-		// const user_id = Number(userid);
-
-		// const UID_NOTE = randomUUID();
 		const id = randomUUID();
 
 		const [note_id] = await knex('notes').insert({
