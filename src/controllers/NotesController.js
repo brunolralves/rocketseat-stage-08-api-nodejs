@@ -1,7 +1,6 @@
 import AppError from '../utils/AppError.js';
 import knex from '../database/knex/index.js';
 import {randomUUID} from 'crypto';
-import { response } from 'express';
 
 
 class NotesController{
@@ -76,32 +75,18 @@ class NotesController{
 	
 	async delete(req,res){
 		const {idInputed} = req.params;
-
-		try {
-			const noteFounded = await knex('notes').where({id: idInputed});
-			console.log(typeof(!noteFounded));
-			
-			console.log(noteFounded == false);
-			if (!noteFounded){
-				await knex('notes').where({id:idInputed}).delete();
-				res.json({noteFounded,message:'Registro apagado'});
-				
-			}else 
-			{
-				throw new AppError('Registro não encontrado',404);
-			}
-			
-
-		} catch (error) {
-			res.json({message: error.message});
-		}
+		await knex('notes').where({id:idInputed}).delete();
+		res.json({});
 	}
 
 	async index(req,res){
 		const {user_id} = req.query;
 
 
-		const notesFounded = await knex('notes').where(x => x.user_id == user_id).orderBy('id');
+		const notesFounded = 
+		await knex('notes')
+			.where(x => x.user_id == user_id)
+			.orderBy('note_id');
 
 		res.json({notes:notesFounded});
 	}
