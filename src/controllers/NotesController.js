@@ -50,6 +50,21 @@ class NotesController{
 		
 	}
 
+
+	async show(req, res) {
+		console.log('here');
+		const {id} = req.params;
+
+		const note = await knex('notes').where(x=>x.note_id = id);
+		const tags = await knex('tags').where(x => x.note_id = id).orderBy('name');
+		const links = await knex('links').where(x => x.note_id = id).orderBy('created_at');
+
+		return res.json({
+			...note,
+			tags,
+			links
+		});
+	}
 	
 }
 
