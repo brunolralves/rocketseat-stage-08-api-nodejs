@@ -78,6 +78,29 @@ class NotesController{
 		});
 	}
 	
+	async delete(req,res){
+		const {idInputed} = req.params;
+
+		try {
+			const noteFounded = await knex('notes').where({id: idInputed});
+			console.log(typeof(!noteFounded));
+			
+			console.log(noteFounded == false);
+			if (!noteFounded){
+				await knex('notes').where({id:idInputed}).delete();
+				res.json({noteFounded,message:'Registro apagado'});
+				
+			}else 
+			{
+				throw new AppError('Registro não encontrado',404);
+			}
+			
+
+		} catch (error) {
+			res.json({message: error.message});
+		}
+	}
+
 }
 
 export default NotesController;
