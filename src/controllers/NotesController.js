@@ -80,15 +80,40 @@ class NotesController{
 	}
 
 	async index(req,res){
-		const {user_id} = req.query;
+		const {tags,title,user_id} = req.query;
+		let notes;
 
+		if(tags)
+		{
+			const filteredTags = 
+			tags.split(',')
+				.map(tag => tag.trim());
 
-		const notesFounded = 
-		await knex('notes')
-			.where(x => x.user_id == user_id)
-			.orderBy('note_id');
+			console.log(filteredTags);
 
-		res.json({notes:notesFounded});
+			notes = 
+			await knex('tags')
+				.select([
+					'notes.note_id',
+					'notes.title',
+					'notes.user_id'
+				])
+				.where('notes.user_id',user_id)
+				.whereLike('notes.title',`%${title}%`)
+				.whereIn('name',filteredTags)
+				.innerJoin('notes','notes.note_id', 'tags.note_id')
+				.orderBy('notes.title');
+
+		}else
+		{
+			notes = 
+			await knex('notes')
+				.where({user_id})
+				.whereLike('title',`%${title}%`)
+				.orderBy('note_id');	
+		}
+			
+		res.json(notes);
 	}
 }
 
